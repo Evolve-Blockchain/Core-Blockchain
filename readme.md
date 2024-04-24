@@ -1,7 +1,7 @@
 
 # Evolve Blockchain Node
 
-This project aims to provide installation, running, and maintenance capabilities of **Evolve validator node** for potential and existing Evolve Blockchain backers. The consensus structure of this chain is delegated proof of stake "DPos" and is governed by the symbiosis of Evolve's implementation of go-ethereum and our system contracts [https://github.com/Evolve/System-Contracts/tree/main]. This repository has multiple release candidates inline so we recommend checking for updates for better functions and stability.
+This project aims to provide installation, running, and maintenance capabilities of **Evolve validator node** for potential and existing Evolve Blockchain backers. The consensus structure of this chain is Hibrid proof of stake "HPos" and is governed by the symbiosis of Evolve's implementation of go-ethereum and our system contracts [https://github.com/Evolve/System-Contracts/tree/main]. This repository has multiple release candidates inline so we recommend checking for updates for better functions and stability.
 
 ## System Requirements
 
@@ -11,7 +11,7 @@ This project aims to provide installation, running, and maintenance capabilities
 
 **Persistent Storage:** 25GB minimum, 100GB high-speed SSD recommended
 
-**Note regarding use of GPUs -** GPUs are primarily used in POW consensus chains. Being a DPos Evolve chain has not only more TPS and fast block production but also doesn't need a GPU altogether for its purpose.
+**Note regarding use of GPUs -** GPUs are primarily used in POW consensus chains. Being a HPos Evolve chain has not only more TPS and fast block production but also doesn't need a GPU altogether for its purpose.
 
 
 
