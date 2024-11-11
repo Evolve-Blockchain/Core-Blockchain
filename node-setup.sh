@@ -44,17 +44,69 @@ task4(){
   # setting up golang TASK 4
   echo -e "\n${ORANGE}TASK: ${GREEN}[Setting GO]${NC}\n"
   rm -rf /usr/local/go && tar -C /usr/local -xzf go1.17.3.linux-amd64.tar.gz
-  echo -e '\nPATH=$PATH:/usr/local/go/bin' >>/etc/profile
 
+  LINE='PATH=$PATH:/usr/local/go/bin'
+  if grep -Fxq "$LINE" /etc/profile
+  then
+    # code if found
+    echo -e "${ORANGE}golang path is already added"
+  else
+    # code if not found
+    echo -e '\nPATH=$PATH:/usr/local/go/bin' >>/etc/profile
+  fi
+
+  echo -e '\nsource ~/.bashrc' >>/etc/profile
+  
   if [[ $totalValidator -gt 0 ]]; then
+    
+    LINE='cd /root/Core-Blockchain/'
+    if grep -Fxq "$LINE" /etc/profile
+    then
+      # code if found
+      echo -e "${ORANGE}path is already added"
+    else
+      # code if not found
       echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
+    fi
+
+    LINE='bash /root/Core-Blockchain/node-start.sh --validator'
+    if grep -Fxq "$LINE" /etc/profile
+    then
+      # code if found
+      echo -e "${ORANGE}autostart is already added"
+    else
+      # code if not found
       echo -e '\nbash /root/Core-Blockchain/node-start.sh --validator' >>/etc/profile
+    fi
+      
+      
   fi
 
   if [[ $totalRpc -gt 0 ]]; then
+
+    LINE='cd /root/Core-Blockchain/'
+    if grep -Fxq "$LINE" /etc/profile
+    then
+      # code if found
+      echo -e "${ORANGE}path is already added"
+    else
+      # code if not found
       echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
+    fi
+
+    LINE='bash /root/Core-Blockchain/node-start.sh --rpc'
+    if grep -Fxq "$LINE" /etc/profile
+    then
+      # code if found
+      echo -e "${ORANGE}autostart is already added"
+    else
+      # code if not found
       echo -e '\nbash /root/Core-Blockchain/node-start.sh --rpc' >>/etc/profile
+    fi
+    
   fi
+
+  
 
   export PATH=$PATH:/usr/local/go/bin
   go env -w GO111MODULE=off
@@ -176,6 +228,7 @@ createRpc(){
     ./node_src/build/bin/geth --datadir ./chaindata/node$i init ./genesis.json
     ((i += 1))
   done
+
 }
 
 createValidator(){
@@ -194,12 +247,105 @@ fetchNsetIP(){
   echo -e "\nIP=$(curl http://checkip.amazonaws.com)" >> ./.env
 }
 
+install_nvm() {
+  # Check if nvm is installed
+  if ! command -v nvm &> /dev/null; then
+    echo "Installing NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+    # Source NVM scripts for the current session
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+    # Add NVM initialization to shell startup file
+    if [ -n "$BASH_VERSION" ]; then
+      SHELL_PROFILE="$HOME/.bashrc"
+    elif [ -n "$ZSH_VERSION" ]; then
+      SHELL_PROFILE="$HOME/.zshrc"
+    fi
+
+    if ! grep -q 'export NVM_DIR="$HOME/.nvm"' "$SHELL_PROFILE"; then
+      echo 'export NVM_DIR="$HOME/.nvm"' >> "$SHELL_PROFILE"
+      echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> "$SHELL_PROFILE"
+      echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> "$SHELL_PROFILE"
+    fi
+  else
+    echo "NVM is already installed."
+  fi
+
+  # Source NVM scripts (if not sourced already)
+  export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+  # Install Node.js version 21.7.1 using nvm
+  echo "Installing Node.js version 21.7.1..."
+  nvm install 21.7.1
+
+  # Use the installed Node.js version
+  nvm use 21.7.1
+
+  # Verify the installation
+  node_version=$(node --version)
+  if [[ $node_version == v21.7.1 ]]; then
+    echo "Node.js version 21.7.1 installed successfully: $node_version"
+  else
+    echo "There was an issue installing Node.js version 21.7.1."
+  fi
+
+  source ~/.bashrc
+
+  npm install --global yarn
+  npm install --global pm2
+
+  source ~/.bashrc
+}
+
+
 finalize(){
   displayWelcome
   createRpc
   createValidator
   labelNodes
-  #fetchNsetIP
+
+  # resource paths
+  nodePath=/root/Core-Blockchain
+  ipcPath=$nodePath/chaindata/node1/geth.ipc
+  chaindataPath=$nodePath/chaindata/node1/geth
+  snapshotName=$nodePath/chaindata.tar.gz
+
+  echo -e "\n\n\t${ORANGE}Removing existing chaindata, if any${NC}"
+  
+  rm -rf $chaindataPath/chaindata
+
+  echo -e "\n\n\t${GREEN}Now importing the snapshot"
+  wget https://snapshots.evolveblockchain.io/chaindata.tar.gz
+
+  # Create the directory if it does not exist
+  if [ ! -d "$chaindataPath" ]; then
+    mkdir -p $chaindataPath
+  fi
+
+  # Extract archive to the correct directory
+  tar -xvf $snapshotName -C $chaindataPath --strip-components=1
+
+  # Set proper permissions
+  echo -e "\n\n\t${GREEN}Setting directory permissions${NC}"
+  chown -R root:root /root/Core-Blockchain/chaindata
+  chmod -R 755 /root/Core-Blockchain/chaindata
+
+  echo -e "\n\n\tImport is done, now configuring sync-helper${NC}"
+  sleep 3
+  cd $nodePath
+  
+
+  install_nvm
+  cd plugins/sync-helper
+  yarn
+  cd ../../
+
+
   displayStatus
 }
 

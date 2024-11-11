@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package tracers
 
@@ -177,28 +177,15 @@ type TraceConfig struct {
 	Reexec  *uint64
 }
 
-type BlockOverrides struct {
-	Number      *hexutil.Big
-	Difficulty  *hexutil.Big
-	Time        *hexutil.Uint64
-	GasLimit    *hexutil.Uint64
-	Coinbase    *common.Address
-	Random      *common.Hash
-	BaseFee     *hexutil.Big
-	BlobBaseFee *hexutil.Big
-}
-
 // TraceCallConfig is the config for traceCall API. It holds one more
 // field to override the state for tracing.
 type TraceCallConfig struct {
-    *vm.LogConfig
-    Tracer         *string
-    Timeout        *string
-    Reexec         *uint64
-    StateOverrides *ethapi.StateOverride
-    BlockOverrides *BlockOverrides // Add this line
+	*vm.LogConfig
+	Tracer         *string
+	Timeout        *string
+	Reexec         *uint64
+	StateOverrides *ethapi.StateOverride
 }
-
 
 // StdTraceConfig holds extra parameters to standard-json trace functions.
 type StdTraceConfig struct {

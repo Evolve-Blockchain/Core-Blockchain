@@ -1,12 +1,11 @@
 package systemcontract
 
 import (
-	"math/big"
-	"strings"
-
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
+	"math/big"
+	"strings"
 )
 
 // ValidatorsInteractiveABI contains all methods to interactive with validator contracts.
@@ -75,6 +74,18 @@ const ValidatorsInteractiveABI = `[
 				"internalType": "uint256",
 				"name": "time",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "To",
+				"type": "address[]"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint64[]",
+				"name": "Gass",
+				"type": "uint64[]"
 			}
 		],
 		"name": "LogDistributeBlockReward",
@@ -334,25 +345,6 @@ const ValidatorsInteractiveABI = `[
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
 				"indexed": false,
 				"internalType": "address",
 				"name": "user",
@@ -450,9 +442,22 @@ const ValidatorsInteractiveABI = `[
 		"name": "ValidatorContractAddr",
 		"outputs": [
 			{
-				"internalType": "address payable",
+				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "WithdrawProfitPeriod",
+		"outputs": [
+			{
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
 			}
 		],
 		"stateMutability": "view",
@@ -485,47 +490,31 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "contractCreator",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
-		"name": "commInfo",
+		"name": "contractPartPercent",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "coinPoolPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "ownerPoolPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "foundationPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "foundationWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "ownerPool",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "coinPool",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "ownerPoolCol",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "ownerPoolColLimit",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -596,7 +585,18 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address[]",
+				"name": "_to",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint64[]",
+				"name": "_gass",
+				"type": "uint64[]"
+			}
+		],
 		"name": "distributeBlockReward",
 		"outputs": [],
 		"stateMutability": "payable",
@@ -755,6 +755,11 @@ const ValidatorsInteractiveABI = `[
 				"type": "uint256"
 			},
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
 				"internalType": "address[]",
 				"name": "",
 				"type": "address[]"
@@ -792,7 +797,7 @@ const ValidatorsInteractiveABI = `[
 		],
 		"name": "initialize",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -879,19 +884,6 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -942,9 +934,21 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_contract",
+				"type": "address"
+			}
+		],
+		"name": "setContractCreator",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -993,6 +997,19 @@ const ValidatorsInteractiveABI = `[
 	},
 	{
 		"inputs": [],
+		"name": "stakerPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "totalBurnt",
 		"outputs": [
 			{
@@ -1019,7 +1036,7 @@ const ValidatorsInteractiveABI = `[
 	},
 	{
 		"inputs": [],
-		"name": "totalStake",
+		"name": "totalRewardOut",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -1031,16 +1048,16 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "totalStake",
+		"outputs": [
 			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -1095,87 +1112,6 @@ const ValidatorsInteractiveABI = `[
 			}
 		],
 		"name": "updateActiveValidatorSet",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_validatorPartPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_burnPartPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_burnStopAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_coinPoolPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_ownerPoolPercent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_foundationPercent",
-				"type": "uint256"
-			}
-		],
-		"name": "updateGasSettings",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_foundationWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_ownerPool",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_coinPool",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_ownerPoolColLimit",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint16",
-				"name": "_MaxValidators",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_MinimalStakingCoin",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_minimumValidatorStaking",
-				"type": "uint256"
-			}
-		],
-		"name": "updateParams",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1415,9 +1351,48 @@ const PunishInteractiveABI = `[
 		"name": "ValidatorContractAddr",
 		"outputs": [
 			{
-				"internalType": "address payable",
+				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "WithdrawProfitPeriod",
+		"outputs": [
+			{
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "burnPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "burnStopAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -1440,6 +1415,19 @@ const PunishInteractiveABI = `[
 			}
 		],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "contractPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -1590,6 +1578,45 @@ const PunishInteractiveABI = `[
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "stakerPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalBurnt",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "validatorPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]`
 
@@ -1599,9 +1626,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "id",
-				"type": "uint256"
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -1630,9 +1657,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "id",
-				"type": "uint256"
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -1655,9 +1682,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "id",
-				"type": "uint256"
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -1699,9 +1726,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "id",
-				"type": "uint256"
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -1795,9 +1822,61 @@ const ProposalInteractiveABI = `[
 		"name": "ValidatorContractAddr",
 		"outputs": [
 			{
-				"internalType": "address payable",
+				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "WithdrawProfitPeriod",
+		"outputs": [
+			{
+				"internalType": "uint64",
+				"name": "",
+				"type": "uint64"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "burnPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "burnStopAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "contractPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -1854,25 +1933,6 @@ const ProposalInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "lastProposalActive",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "minimumValidatorStaking",
 		"outputs": [
@@ -1906,19 +1966,6 @@ const ProposalInteractiveABI = `[
 	},
 	{
 		"inputs": [],
-		"name": "proposalCount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "proposalLastingPeriod",
 		"outputs": [
 			{
@@ -1933,9 +1980,9 @@ const ProposalInteractiveABI = `[
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "",
-				"type": "uint256"
+				"type": "bytes32"
 			}
 		],
 		"name": "proposals",
@@ -1999,11 +2046,50 @@ const ProposalInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "stakerPartPercent",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "id",
+				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalBurnt",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "validatorPartPercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "id",
+				"type": "bytes32"
 			},
 			{
 				"internalType": "bool",
@@ -2030,9 +2116,9 @@ const ProposalInteractiveABI = `[
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "",
-				"type": "uint256"
+				"type": "bytes32"
 			}
 		],
 		"name": "votes",
@@ -2390,25 +2476,24 @@ const PunishV1InteractiveABI = `[
 
 // DevMappingPosition is the position of the state variable `devs`.
 // Since the state variables are as follow:
+//    bool public initialized;
+//    bool public devVerifyEnabled;
+//    address public admin;
+//    address public pendingAdmin;
 //
-//	bool public initialized;
-//	bool public devVerifyEnabled;
-//	address public admin;
-//	address public pendingAdmin;
+//    mapping(address => bool) private devs;
 //
-//	mapping(address => bool) private devs;
+//    //NOTE: make sure this list is not too large!
+//    address[] blacksFrom;
+//    address[] blacksTo;
+//    mapping(address => uint256) blacksFromMap;      // address => index+1
+//    mapping(address => uint256) blacksToMap;        // address => index+1
 //
-//	//NOTE: make sure this list is not too large!
-//	address[] blacksFrom;
-//	address[] blacksTo;
-//	mapping(address => uint256) blacksFromMap;      // address => index+1
-//	mapping(address => uint256) blacksToMap;        // address => index+1
-//
-//	uint256 public blackLastUpdatedNumber; // last block number when the black list is updated
-//	uint256 public rulesLastUpdatedNumber;  // last block number when the rules are updated
-//	// event check rules
-//	EventCheckRule[] rules;
-//	mapping(bytes32 => mapping(uint128 => uint256)) rulesMap;   // eventSig => checkIdx => indexInArray+1
+//    uint256 public blackLastUpdatedNumber; // last block number when the black list is updated
+//    uint256 public rulesLastUpdatedNumber;  // last block number when the rules are updated
+//    // event check rules
+//    EventCheckRule[] rules;
+//    mapping(bytes32 => mapping(uint128 => uint256)) rulesMap;   // eventSig => checkIdx => indexInArray+1
 //
 // according to [Layout of State Variables in Storage](https://docs.soliditylang.org/en/v0.8.4/internals/layout_in_storage.html),
 // and after optimizer enabled, the `initialized`, `enabled` and `admin` will be packed, and stores at slot 0,

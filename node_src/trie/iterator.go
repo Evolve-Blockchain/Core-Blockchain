@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package trie
 
@@ -151,10 +151,9 @@ func (e seekError) Error() string {
 	return "seek error: " + e.err.Error()
 }
 
-// newNodeIterator returns nil when empty
 func newNodeIterator(trie *Trie, start []byte) NodeIterator {
 	if trie.Hash() == emptyState {
-		return nil
+		return new(nodeIterator)
 	}
 	it := &nodeIterator{trie: trie}
 	it.err = it.seek(start)
@@ -484,7 +483,6 @@ func (it *nodeIterator) push(state *nodeIteratorState, parentIndex *int, path []
 func (it *nodeIterator) pop() {
 	parent := it.stack[len(it.stack)-1]
 	it.path = it.path[:parent.pathlen]
-	it.stack[len(it.stack)-1] = nil
 	it.stack = it.stack[:len(it.stack)-1]
 }
 

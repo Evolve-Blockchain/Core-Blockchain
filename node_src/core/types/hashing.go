@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package types
 
@@ -32,7 +32,7 @@ var hasherPool = sync.Pool{
 	New: func() interface{} { return sha3.NewLegacyKeccak256() },
 }
 
-// deriveBufferPool holds temporary encoder buffers for DeriveSha and TX encoding.
+// encodeBufferPool holds temporary encoder buffers for DeriveSha and TX encoding.
 var encodeBufferPool = sync.Pool{
 	New: func() interface{} { return new(bytes.Buffer) },
 }
@@ -78,11 +78,11 @@ type DerivableList interface {
 func encodeForDerive(list DerivableList, i int, buf *bytes.Buffer) []byte {
 	buf.Reset()
 	list.EncodeIndex(i, buf)
-	// It's really unfortunate that we need to do perform this copy.
-	// StackTrie holds onto the values until Hash is called, so the values
-	// written to it must not alias.
 	return common.CopyBytes(buf.Bytes())
 }
+
+// Define the maximum size for RLP encoded uint64
+const rlpMaxUint64Size = 9
 
 // DeriveSha creates the tree hashes of transactions and receipts in a block header.
 func DeriveSha(list DerivableList, hasher TrieHasher) common.Hash {
@@ -91,10 +91,7 @@ func DeriveSha(list DerivableList, hasher TrieHasher) common.Hash {
 	valueBuf := encodeBufferPool.Get().(*bytes.Buffer)
 	defer encodeBufferPool.Put(valueBuf)
 
-	// StackTrie requires values to be inserted in increasing hash order, which is not the
-	// order that `list` provides hashes in. This insertion sequence ensures that the
-	// order is correct.
-	var indexBuf []byte
+	indexBuf := make([]byte, rlpMaxUint64Size)
 	for i := 1; i < list.Len() && i <= 0x7f; i++ {
 		indexBuf = rlp.AppendUint64(indexBuf[:0], uint64(i))
 		value := encodeForDerive(list, i, valueBuf)

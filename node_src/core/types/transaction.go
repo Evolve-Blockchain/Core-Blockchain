@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package types
 
@@ -87,6 +87,15 @@ type TxData interface {
 
 	rawSignatureValues() (v, r, s *big.Int)
 	setSignatureValues(chainID, v, r, s *big.Int)
+}
+
+// SetGas sets the gas value of the transaction.
+func (t *Transaction) SetGas(gas uint64) {
+	// Check if the `inner` field implements the `TxData` interface
+	if innerTx, ok := t.inner.(interface{ setGas(gas uint64) }); ok {
+		// Call the `setGas` method on `innerTx` to update the `gas` value
+		innerTx.setGas(gas)
+	}
 }
 
 // EncodeRLP implements rlp.Encoder

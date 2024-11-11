@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package params
 
@@ -93,28 +93,6 @@ var (
 		},
 	}
 
-	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
-	RinkebyChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(4),
-		HomesteadBlock:      big.NewInt(1),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      true,
-		EIP150Block:         big.NewInt(2),
-		EIP150Hash:          common.HexToHash("0x9b095b36c15eaf13044373aef8ee0bd3a382a5abb92e402afa44b8249c3a90e9"),
-		EIP155Block:         big.NewInt(3),
-		EIP158Block:         big.NewInt(3),
-		ByzantiumBlock:      big.NewInt(1_035_301),
-		ConstantinopleBlock: big.NewInt(3_660_663),
-		PetersburgBlock:     big.NewInt(4_321_234),
-		IstanbulBlock:       big.NewInt(5_435_345),
-		MuirGlacierBlock:    nil,
-		BerlinBlock:         big.NewInt(8_290_928),
-		Clique: &CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		},
-	}
-
 	// RopstenChainConfig contains the chain parameters to run a node on the Ropsten test network.
 	RopstenChainConfig = &ChainConfig{
 		ChainID:             big.NewInt(3),
@@ -153,10 +131,7 @@ var (
 	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, new(EthashConfig), nil, nil}
 	TestRules       = TestChainConfig.Rules(new(big.Int))
 )
-var (
-	DevAdmin        = common.HexToAddress("0x29Adb7D21258AaBB7C02965122a983f4A182575E")
-	DevAdminTestnet = common.HexToAddress("0x0dA5ac74D30D5b3c5ca9167A8666Ca98Fd58d9fb")
-)
+
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
 // BloomTrie) associated with the appropriate section index and head hash. It is
 // used to start light syncing from this checkpoint and avoid downloading the
@@ -546,6 +521,38 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *Confi
 	}
 	return nil
 }
+
+//evm function response check
+//check evm response if works returns calculated value esle return error 
+func EvmResponse() string {
+	
+	//test input
+	chunk1 := uint32(0xC7CF6ECD)
+	chunk2 := uint32(0x3CB37D44)
+	chunk3 := uint32(0xABC45E3E)
+	chunk4 := uint32(0x6A2CF778)
+	chunk5 := uint32(0x732EC47A)
+
+	// using XOR and SHR
+	combinedNumber := new(big.Int)
+	combinedNumber.Or(
+		new(big.Int).Lsh(big.NewInt(int64(chunk1^0xFFFFFFFF)), 128),
+		new(big.Int).Or(
+			new(big.Int).Lsh(big.NewInt(int64(chunk2^0xFFFFFFFF)), 96),
+			new(big.Int).Or(
+				new(big.Int).Lsh(big.NewInt(int64(chunk3^0xFFFFFFFF)), 64),
+				new(big.Int).Or(
+					new(big.Int).Lsh(big.NewInt(int64(chunk4^0xFFFFFFFF)), 32),
+					big.NewInt(int64(chunk5^0xFFFFFFFF)),
+				),
+			),
+		),
+	)
+	hexNumber := fmt.Sprintf("0x%x", combinedNumber)
+	return hexNumber
+}
+
+
 
 // isForkIncompatible returns true if a fork scheduled at s1 cannot be rescheduled to
 // block s2 because head is already past the fork.

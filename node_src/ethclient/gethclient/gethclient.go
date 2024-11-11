@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 // Package gethclient provides an RPC client for geth-specific APIs.
 package gethclient
@@ -82,6 +82,22 @@ type StorageResult struct {
 // The block number can be nil, in which case the value is taken from the latest known block.
 func (ec *Client) GetProof(ctx context.Context, account common.Address, keys []string, blockNumber *big.Int) (*AccountResult, error) {
 
+	type storageResult struct {
+		Key   string       `json:"key"`
+		Value *hexutil.Big `json:"value"`
+		Proof []string     `json:"proof"`
+	}
+
+	type accountResult struct {
+		Address      common.Address  `json:"address"`
+		AccountProof []string        `json:"accountProof"`
+		Balance      *hexutil.Big    `json:"balance"`
+		CodeHash     common.Hash     `json:"codeHash"`
+		Nonce        hexutil.Uint64  `json:"nonce"`
+		StorageHash  common.Hash     `json:"storageHash"`
+		StorageProof []storageResult `json:"storageProof"`
+	}
+
 	var res accountResult
 	err := ec.c.CallContext(ctx, &res, "eth_getProof", account, keys, toBlockNumArg(blockNumber))
 	// Turn hexutils back to normal datatypes
@@ -100,11 +116,9 @@ func (ec *Client) GetProof(ctx context.Context, account common.Address, keys []s
 		Nonce:        uint64(res.Nonce),
 		CodeHash:     res.CodeHash,
 		StorageHash:  res.StorageHash,
-		StorageProof: storageResults,  // Fix: Populate StorageProof field
 	}
 	return &result, err
 }
-
 
 // OverrideAccount specifies the state of an account to be overridden.
 // type OverrideAccount struct {

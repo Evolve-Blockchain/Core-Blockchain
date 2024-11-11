@@ -1,7 +1,7 @@
 
 # Evolve Blockchain Node
 
-This project aims to provide installation, running, and maintenance capabilities of **Evolve validator node** for potential and existing Evolve Blockchain backers. The consensus structure of this chain is Hibrid proof of stake "HPos" and is governed by the symbiosis of Evolve's implementation of go-ethereum and our system contracts [https://github.com/Evolve/System-Contracts/tree/main]. This repository has multiple release candidates inline so we recommend checking for updates for better functions and stability.
+This project aims to provide installation, running, and maintenance capabilities of **Evolve validator node** for potential and existing Evolve Blockchain backers. The consensus structure of this chain is Hibrid proof of stake "HPos" and is governed by the symbiosis of Evolve's implementation of go-ethereum and our system contracts [https://github.com/Evolve-Blockchain/System-Contracts/tree/main]. This repository has multiple release candidates inline so we recommend checking for updates for better functions and stability.
 
 ## System Requirements
 
@@ -17,17 +17,25 @@ This project aims to provide installation, running, and maintenance capabilities
 
 ## How to become a validator
 To back the Evolve blockchain you can become a validator. Full flow to become a validator, you must:
+
 * Install this package **([See Installation](#installation))**
+
 * Download your newly created validator wallet from your server and import it into your metamask or preferred wallet. Fund this account with the appropriate EVO tokens needed to become a validator. Example command to download the wallet on your local PC. Only works for UNIX-based OSes or on any environment that can run the OpenSSH package:
 ```bash
-  scp -r root@<server_ip>:/root/evolve-chain/chaindata/node1/keystore
-  scp root@<server_ip>:/root/evolve-chain/chaindata/node1/pass.txt
+  scp -r root@<server_ip>:/root/Core-Blockchain/chaindata/node1/keystore
+  scp root@<server_ip>:/root/Core-Blockchain/chaindata/node1/pass.txt
 ```
+
 * On your server, start the node that you just installed **([See Usage/Example](#usageexamples))**
+
 * Once the node is started and confirmation is seen on your terminal, open the interactive console by attaching tmux session **([See Usage/Example](#usageexamples))**
+
 * Once inside the interactive console, you'll see "IMPORTED TRANSACTION OBJECTS" and "age=<some period like 6d5hr or 5mon 3weeks>". You need to wait until the "unauthorized validator" warning starts to pop up on the console. 
-* Once "unauthorized validators" warning shows up, go to https://staking.evolveblockchain.io and click "Become a validator". Fill in all the details in the form, in the "Fee address" field enter the validator wallet address that you imported into your metamask. Proceed further
+
+* Once "unauthorized validators" warning shows up, go to https://gov.evolveblockchain.io/ and click on "Add a proposal" then after voting is done by all other validators, goto https://staking.evolveblockchain.io and click "Become a validator". Fill in all the details in the form, in the "Fee address" field enter the validator wallet address that you imported into your metamask. Proceed further
+
 * Once the last step is done, you'll see a "🔨 mined potential block" message on the interactive console. You'll also see your validator wallet as a validator on the staking page and on explorer. You should also detach from the console after the whole process is done **([See Usage/Example](#usageexamples))**
+
 ## Installation
 
 **You must ensure that:** 
@@ -49,9 +57,9 @@ Skip the above commands if you have already updated the system and installed the
 Connect again to your server after reboot
 ```bash
   sudo -i
-  git clone https://github.com/Evolve/evolve-chain.git
-  cd evolve-chain
-  ./node-setup --validator 1
+  git clone https://github.com/Evolve-Blockchain/Core-Blockchain.git
+  cd Core-Blockchain
+  ./node-setup.sh --validator 1
 ```
 After you run node-setup, follow the on-screen instructions carefully and you'll get confirmation that the node was successfully installed on your system.
 
@@ -67,6 +75,7 @@ Display help
 To create/install a validator node. Fresh first-time install
 ```bash
 ./node-setup.sh --validator 1
+source ~/.bashrc
 ```
 To run the validator node
 ```bash
@@ -75,6 +84,7 @@ To run the validator node
 To create/install a RPC node. Fresh first-time install
 ```bash
 ./node-setup.sh --rpc
+source ~/.bashrc
 ```
 To run the RPC node
 ```bash
@@ -84,6 +94,11 @@ To get into a running node's interactive console/tmux session
 ```bash
 tmux attach -t node1
 ```
+To stop a running node or the running blockchain node 
+```bash
+tmux attach -t node1
+```
+
 To exit/detach from an interactive console
 ```text
 Press CTRL & b , release both keys, and press d

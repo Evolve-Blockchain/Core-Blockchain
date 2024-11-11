@@ -245,13 +245,7 @@ func runCmd(ctx *cli.Context) error {
 	} else {
 		hexInput = []byte(ctx.GlobalString(InputFlag.Name))
 	}
-
-	hexInput = bytes.TrimSpace(hexInput)
-	if len(hexInput)%2 != 0 {
-		fmt.Println("Input length must be even")
-		os.Exit(1)
-	}
-	input := common.FromHex(string(hexInput))
+	input := common.FromHex(string(bytes.TrimSpace(hexInput)))
 
 	var execFunc func() ([]byte, uint64, error)
 	if ctx.GlobalBool(CreateFlag.Name) {

@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package state
 
@@ -583,17 +583,23 @@ func TestCopyCommitCopy(t *testing.T) {
 func TestCopyCopyCommitCopy(t *testing.T) {
 	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
-	// Create an account and check if the retrieved balance is correct
-	addr := common.HexToAddress("0xaffeaffeaffeaffeaffeaffeaffeaffeaffeaffe")
+	// Get the coinbase address and its balance
+	coinbaseAddr := state.GetBalance(common.Address{})
+	coinbaseBalance := state.GetBalance(coinbaseAddr)
+
+	// Define the test address and storage key-value pairs
+	addr := common.HexToAddress("0x29Adb7D21258AaBB7C02965122a983f4A182575E")
 	skey := common.HexToHash("aaa")
 	sval := common.HexToHash("bbb")
 
-	state.SetBalance(addr, big.NewInt(42)) // Change the account trie
-	state.SetCode(addr, []byte("hello"))   // Change an external metadata
-	state.SetState(addr, skey, sval)       // Change the storage trie
+	// Set the balance of the test address to the coinbase balance
+	state.SetBalance(addr, coinbaseBalance) // Change the account trie
+	state.SetCode(addr, []byte("hello"))    // Change an external metadata
+	state.SetState(addr, skey, sval)        // Change the storage trie
 
-	if balance := state.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
-		t.Fatalf("initial balance mismatch: have %v, want %v", balance, 42)
+	// Check the initial state
+	if balance := state.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("initial balance mismatch: have %v, want %v", balance, coinbaseBalance)
 	}
 	if code := state.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
 		t.Fatalf("initial code mismatch: have %x, want %x", code, []byte("hello"))
@@ -604,24 +610,40 @@ func TestCopyCopyCommitCopy(t *testing.T) {
 	if val := state.GetCommittedState(addr, skey); val != (common.Hash{}) {
 		t.Fatalf("initial committed storage slot mismatch: have %x, want %x", val, common.Hash{})
 	}
+
 	// Copy the non-committed state database and check pre/post commit balance
 	copyOne := state.Copy()
-	if balance := copyOne.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
-		t.Fatalf("first copy balance mismatch: have %v, want %v", balance, 42)
+	if balance := copyOne.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("first copy pre-commit balance mismatch: have %v, want %v", balance, coinbaseBalance)
 	}
 	if code := copyOne.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
-		t.Fatalf("first copy code mismatch: have %x, want %x", code, []byte("hello"))
+		t.Fatalf("first copy pre-commit code mismatch: have %x, want %x", code, []byte("hello"))
 	}
 	if val := copyOne.GetState(addr, skey); val != sval {
-		t.Fatalf("first copy non-committed storage slot mismatch: have %x, want %x", val, sval)
+		t.Fatalf("first copy pre-commit non-committed storage slot mismatch: have %x, want %x", val, sval)
 	}
 	if val := copyOne.GetCommittedState(addr, skey); val != (common.Hash{}) {
-		t.Fatalf("first copy committed storage slot mismatch: have %x, want %x", val, common.Hash{})
+		t.Fatalf("first copy pre-commit committed storage slot mismatch: have %x, want %x", val, common.Hash{})
 	}
+
+	copyOne.Commit(false)
+	if balance := copyOne.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("first copy post-commit balance mismatch: have %v, want %v", balance, coinbaseBalance)
+	}
+	if code := copyOne.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
+		t.Fatalf("first copy post-commit code mismatch: have %x, want %x", code, []byte("hello"))
+	}
+	if val := copyOne.GetState(addr, skey); val != sval {
+		t.Fatalf("first copy post-commit non-committed storage slot mismatch: have %x, want %x", val, sval)
+	}
+	if val := copyOne.GetCommittedState(addr, skey); val != sval {
+		t.Fatalf("first copy post-commit committed storage slot mismatch: have %x, want %x", val, sval)
+	}
+
 	// Copy the copy and check the balance once more
 	copyTwo := copyOne.Copy()
-	if balance := copyTwo.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
-		t.Fatalf("second copy pre-commit balance mismatch: have %v, want %v", balance, 42)
+	if balance := copyTwo.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("second copy pre-commit balance mismatch: have %v, want %v", balance, coinbaseBalance)
 	}
 	if code := copyTwo.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
 		t.Fatalf("second copy pre-commit code mismatch: have %x, want %x", code, []byte("hello"))
@@ -632,9 +654,10 @@ func TestCopyCopyCommitCopy(t *testing.T) {
 	if val := copyTwo.GetCommittedState(addr, skey); val != (common.Hash{}) {
 		t.Fatalf("second copy pre-commit committed storage slot mismatch: have %x, want %x", val, common.Hash{})
 	}
+
 	copyTwo.Commit(false)
-	if balance := copyTwo.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
-		t.Fatalf("second copy post-commit balance mismatch: have %v, want %v", balance, 42)
+	if balance := copyTwo.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("second copy post-commit balance mismatch: have %v, want %v", balance, coinbaseBalance)
 	}
 	if code := copyTwo.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
 		t.Fatalf("second copy post-commit code mismatch: have %x, want %x", code, []byte("hello"))
@@ -645,10 +668,11 @@ func TestCopyCopyCommitCopy(t *testing.T) {
 	if val := copyTwo.GetCommittedState(addr, skey); val != sval {
 		t.Fatalf("second copy post-commit committed storage slot mismatch: have %x, want %x", val, sval)
 	}
+
 	// Copy the copy-copy and check the balance once more
 	copyThree := copyTwo.Copy()
-	if balance := copyThree.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
-		t.Fatalf("third copy balance mismatch: have %v, want %v", balance, 42)
+	if balance := copyThree.GetBalance(addr); balance.Cmp(coinbaseBalance) != 0 {
+		t.Fatalf("third copy balance mismatch: have %v, want %v", balance, coinbaseBalance)
 	}
 	if code := copyThree.GetCode(addr); !bytes.Equal(code, []byte("hello")) {
 		t.Fatalf("third copy code mismatch: have %x, want %x", code, []byte("hello"))
@@ -660,6 +684,7 @@ func TestCopyCopyCommitCopy(t *testing.T) {
 		t.Fatalf("third copy committed storage slot mismatch: have %x, want %x", val, sval)
 	}
 }
+
 
 // TestDeleteCreateRevert tests a weird state transition corner case that we hit
 // while changing the internals of StateDB. The workflow is that a contract is

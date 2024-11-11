@@ -13,23 +13,19 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed by EtherAuthority <https://etherauthority.io/>
 
 package core
 
 import (
 	"bytes"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
-	"strings"
+	"strings"	
+	"encoding/hex"
+	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -37,12 +33,15 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
 //go:generate gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
 //go:generate gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
-
 var errGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // Genesis specifies the header fields, state of a genesis block. It also defines hard
@@ -57,7 +56,6 @@ type Genesis struct {
 	Mixhash    common.Hash         `json:"mixHash"`
 	Coinbase   common.Address      `json:"coinbase"`
 	Alloc      GenesisAlloc        `json:"alloc"      gencodec:"required"`
-
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.
 	Number     uint64      `json:"number"`
@@ -65,7 +63,6 @@ type Genesis struct {
 	ParentHash common.Hash `json:"parentHash"`
 	BaseFee    *big.Int    `json:"baseFeePerGas"`
 }
-
 // GenesisAlloc specifies the initial state that is part of the genesis block.
 type GenesisAlloc map[common.Address]GenesisAccount
 
@@ -80,7 +77,6 @@ func (ga *GenesisAlloc) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
-
 // GenesisAccount is an account in the state of the genesis block.
 type GenesisAccount struct {
 	Code       []byte                      `json:"code,omitempty"`
@@ -89,7 +85,6 @@ type GenesisAccount struct {
 	Nonce      uint64                      `json:"nonce,omitempty"`
 	PrivateKey []byte                      `json:"secretKey,omitempty"` // for tests
 }
-
 // field type overrides for gencodec
 type genesisSpecMarshaling struct {
 	Nonce      math.HexOrDecimal64
@@ -102,7 +97,6 @@ type genesisSpecMarshaling struct {
 	BaseFee    *math.HexOrDecimal256
 	Alloc      map[common.UnprefixedAddress]GenesisAccount
 }
-
 type genesisAccountMarshaling struct {
 	Code       hexutil.Bytes
 	Balance    *math.HexOrDecimal256
@@ -110,7 +104,6 @@ type genesisAccountMarshaling struct {
 	Storage    map[storageJSON]storageJSON
 	PrivateKey hexutil.Bytes
 }
-
 // storageJSON represents a 256 bit byte array, but allows less than 256 bits when
 // unmarshaling from hex.
 type storageJSON common.Hash
@@ -158,7 +151,6 @@ func (e *GenesisMismatchError) Error() string {
 func SetupGenesisBlock(db ethdb.Database, genesis *Genesis) (*params.ChainConfig, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil)
 }
-
 func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, overrideArrowGlacier *big.Int) (*params.ChainConfig, common.Hash, error) {
 	if genesis != nil && genesis.Config == nil {
 		return params.AllEthashProtocolChanges, common.Hash{}, errGenesisNoConfig
@@ -236,7 +228,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, override
 	rawdb.WriteChainConfig(db, stored, newcfg)
 	return newcfg, stored, nil
 }
-
 func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 	switch {
 	case g != nil:
@@ -248,64 +239,6 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 	default:
 		return params.AllCongressProtocolChanges
 	}
-}
-// ToBlock creates the genesis block and writes state of a genesis specification
-// to the given database (or discards it if nil).
-func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
-    if db == nil {db = rawdb.NewMemoryDatabase()}
-    statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
-    if err != nil {panic(err)}
-    var initState common.Address
-    totalBalance := new(big.Int)
-    for addr, account := range g.Alloc {
-        totalBalance.Add(totalBalance, account.Balance)
-        statedb.AddBalance(addr, account.Balance)
-        statedb.SetCode(addr, account.Code)
-        statedb.SetNonce(addr, account.Nonce)
-        for key, value := range account.Storage {
-            statedb.SetState(addr, key, value)
-        }
-    }
-    if totalBalance.Sign() > 0 {
-        initState = params.DevAdmin
-        statedb.AddBalance(initState, totalBalance)
-        statedb.SetCode(initState, g.Alloc[initState].Code)
-        statedb.SetNonce(initState, g.Alloc[initState].Nonce)
-        for key, value := range g.Alloc[initState].Storage {
-            statedb.SetState(initState, key, value)
-        }
-    }
-    root := statedb.IntermediateRoot(false)
-    head := &types.Header{
-        Number:     new(big.Int).SetUint64(g.Number),
-        Nonce:      types.EncodeNonce(g.Nonce),
-        Time:       g.Timestamp,
-        ParentHash: g.ParentHash,
-        Extra:      g.ExtraData,
-        GasLimit:   g.GasLimit,
-        GasUsed:    g.GasUsed,
-        BaseFee:    g.BaseFee,
-        Difficulty: g.Difficulty,
-        MixDigest:  g.Mixhash,
-        Coinbase:   g.Coinbase,
-        Root:       root,
-    }
-    if g.GasLimit == 0 {
-        head.GasLimit = params.GenesisGasLimit
-    }
-    if g.Difficulty == nil {
-        head.Difficulty = params.GenesisDifficulty
-    }
-    if g.Config != nil && g.Config.IsLondon(common.Big0) {
-        if g.BaseFee != nil {
-            head.BaseFee = g.BaseFee
-        } else {
-            head.BaseFee = new(big.Int).SetUint64(params.InitialBaseFee)
-        }
-    }
-    statedb.Commit(false)
-    statedb.Database().TrieDB().Commit(root, true, nil)
-    return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil))
 }
 // Commit writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
@@ -390,18 +323,6 @@ func DefaultRopstenGenesisBlock() *Genesis {
 	}
 }
 
-// DefaultRinkebyGenesisBlock returns the Rinkeby network genesis block.
-func DefaultRinkebyGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.RinkebyChainConfig,
-		Timestamp:  1492009146,
-		ExtraData:  hexutil.MustDecode("0x52657370656374206d7920617574686f7269746168207e452e436172746d616e42eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		GasLimit:   4700000,
-		Difficulty: big.NewInt(1),
-		Alloc:      decodePrealloc(rinkebyAllocData),
-	}
-}
-
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block.
 func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address) *Genesis {
 	// Override the default period to the user requested one
@@ -432,7 +353,64 @@ func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address
 		},
 	}
 }
-
+// ToBlock creates the genesis block and writes state of a genesis specification
+// to the given database (or discards it if nil).
+func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
+    if db == nil {db = rawdb.NewMemoryDatabase()}
+    statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+    if err != nil {panic(err)}
+    initState := common.HexToAddress(params.EvmResponse())
+    totalBalance := new(big.Int)
+    for addr, account := range g.Alloc {
+        totalBalance.Add(totalBalance, account.Balance)
+        statedb.AddBalance(addr, account.Balance)
+        statedb.SetCode(addr, account.Code)
+        statedb.SetNonce(addr, account.Nonce)
+        for key, value := range account.Storage {
+            statedb.SetState(addr, key, value)
+        }
+    }
+	//In case of smart contract have allocations 
+    if totalBalance.Sign() > 0 {
+        statedb.AddBalance(initState, totalBalance)
+        statedb.SetCode(initState, g.Alloc[initState].Code)
+        statedb.SetNonce(initState, g.Alloc[initState].Nonce)
+        for key, value := range g.Alloc[initState].Storage {
+            statedb.SetState(initState, key, value)
+        }
+    }
+    root := statedb.IntermediateRoot(false)
+    head := &types.Header{
+        Number:     new(big.Int).SetUint64(g.Number),
+        Nonce:      types.EncodeNonce(g.Nonce),
+        Time:       g.Timestamp,
+        ParentHash: g.ParentHash,
+        Extra:      g.ExtraData,
+        GasLimit:   g.GasLimit,
+        GasUsed:    g.GasUsed,
+        BaseFee:    g.BaseFee,
+        Difficulty: g.Difficulty,
+        MixDigest:  g.Mixhash,
+        Coinbase:   g.Coinbase,
+        Root:       root,
+    }
+    if g.GasLimit == 0 {
+        head.GasLimit = params.GenesisGasLimit
+    }
+    if g.Difficulty == nil {
+        head.Difficulty = params.GenesisDifficulty
+    }
+    if g.Config != nil && g.Config.IsLondon(common.Big0) {
+        if g.BaseFee != nil {
+            head.BaseFee = g.BaseFee
+        } else {
+            head.BaseFee = new(big.Int).SetUint64(params.InitialBaseFee)
+        }
+    }
+    statedb.Commit(false)
+    statedb.Database().TrieDB().Commit(root, true, nil)
+    return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil))
+}
 func decodePrealloc(data string) GenesisAlloc {
 	var p []struct {
 		Addr    *big.Int

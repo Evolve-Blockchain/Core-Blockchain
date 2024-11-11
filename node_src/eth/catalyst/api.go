@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 // Package catalyst implements the temporary eth1/eth2 RPC integration.
 package catalyst
@@ -36,8 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
 )
-
-const BloomByteLength = 256
 
 // Register adds catalyst APIs to the node.
 func Register(stack *node.Node, backend *eth.Ethereum) error {
@@ -253,11 +251,6 @@ func insertBlockParamsToBlock(config *chainParams.ChainConfig, parent *types.Hea
 	if err != nil {
 		return nil, err
 	}
-
-  // Validate LogsBloom length
-  if len(params.LogsBloom) != BloomByteLength {
-      return nil, errors.New("Invalid LogsBloom length")
-  }
 
 	number := big.NewInt(0)
 	number.SetUint64(params.Number)

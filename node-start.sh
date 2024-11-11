@@ -19,6 +19,7 @@ isValidator=false
 
 #########################################################################
 source ./.env
+source ~/.bashrc
 #########################################################################
 
 #+-----------------------------------------------------------------------------------------------+
@@ -117,7 +118,15 @@ finalize(){
 
   echo -e "\n${GREEN}+------------------ Active Nodes -------------------+"
   tmux ls
-  echo -e "\n${GREEN}+------------------ Active Nodes -------------------+${NC}"
+
+  echo -e "\n${GREEN}+------------------ Starting sync-helper -------------------+${NC}"
+  echo -e "\n${ORANGE}+-- Please wait a few seconds. Do not turn off the server or interrupt --+"
+  
+  cd ./plugins/sync-helper/
+  pm2 start index.js
+  pm2 save
+  cd ../../
+
 }
 
 

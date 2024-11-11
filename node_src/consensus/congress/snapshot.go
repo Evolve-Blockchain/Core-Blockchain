@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package congress
 
@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"sort"
+  "errors"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -111,8 +112,6 @@ func (s *Snapshot) copy() *Snapshot {
 	return cpy
 }
 
-// apply creates a new authorization snapshot by applying the given headers to
-// the original one.
 func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderReader, parents []*types.Header) (*Snapshot, error) {
 	// Allow passing in no headers for cleaner code
 	if len(headers) == 0 {
@@ -134,8 +133,16 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 		// Remove any votes on checkpoint blocks
 		number := header.Number.Uint64()
 		// Delete the oldest validator from the recent list to allow it signing again
-		if limit := uint64(len(snap.Validators)/2 + 1); number >= limit {
-			delete(snap.Recents, number-limit)
+		var limit uint64
+		if len(snap.Validators) > 21 || len(snap.Validators) == 1 {
+			limit = uint64(len(snap.Validators)/2 + 1)
+		} else { //if number > 9299500 {
+			limit = 2
+		}
+		if number >= limit {
+			for i := uint64(0); i < limit; i++ {
+				delete(snap.Recents, number-limit+i)
+			}
 		}
 		// Resolve the authorization key and check against validators
 		validator, err := ecrecover(header, s.sigcache)
@@ -147,7 +154,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 		}
 		for _, recent := range snap.Recents {
 			if recent == validator {
-				return nil, errRecentlySigned
+				return nil, errors.New("signed recently location 2")
 			}
 		}
 		snap.Recents[number] = validator
@@ -167,11 +174,15 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 				newValidators[validator] = struct{}{}
 			}
 
-			// need to delete recorded recent seen blocks if necessary, it may pause whole chain when validators length
-			// decreases.
-			limit := uint64(len(newValidators)/2 + 1)
+			// Need to delete recorded recent seen blocks if necessary, it may pause whole chain when validators length decreases.
+			var epochLimit uint64      
+			if len(newValidators) > 21 || len(newValidators) == 1 {
+				epochLimit = uint64(len(newValidators)/2 + 1)
+			} else { //if number > 9299500 {
+				epochLimit = 2
+			} 
 			for i := 0; i < len(snap.Validators)/2-len(newValidators)/2; i++ {
-				delete(snap.Recents, number-limit-uint64(i))
+				delete(snap.Recents, number-epochLimit-uint64(i))
 			}
 
 			snap.Validators = newValidators
@@ -183,6 +194,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 
 	return snap, nil
 }
+
 
 // validators retrieves the list of authorized validators in ascending order.
 func (s *Snapshot) validators() []common.Address {

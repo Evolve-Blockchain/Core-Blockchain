@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-// bug across the project fixed by EtherAuthority <https://etherauthority.io/>
+// bug across the entire project files fixed and high tx per block feature added  by EtherAuthority <https://etherauthority.io/>
 
 package p2p
 
@@ -290,9 +290,8 @@ loop:
 func (p *Peer) pingLoop() {
 	// ping := time.NewTimer(pingInterval)
 	defer p.wg.Done()
-
+	
 	ping := time.NewTimer(pingInterval)
-	defer ping.Stop()
 
 	for {
 		select {
@@ -301,7 +300,6 @@ func (p *Peer) pingLoop() {
 				p.protoErr <- err
 				return
 			}
-
 			ping.Reset(pingInterval)
 
 		case <-p.pingRecv:
@@ -338,7 +336,7 @@ func (p *Peer) handle(msg Msg) error {
 		case p.pingRecv <- struct{}{}:
 		case <-p.closed:
 		}
-
+		
 	case msg.Code == discMsg:
 		// This is the last message. We don't need to discard or
 		// check errors because, the connection will be closed after it.
