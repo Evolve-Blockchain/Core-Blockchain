@@ -22,8 +22,8 @@ To back the Evolve blockchain you can become a validator. Full flow to become a 
 
 * Download your newly created validator wallet from your server and import it into your metamask or preferred wallet. Fund this account with the appropriate EVO tokens needed to become a validator. Example command to download the wallet on your local PC. Only works for UNIX-based OSes or on any environment that can run the OpenSSH package:
 ```bash
-  scp -r root@<server_ip>:/root/Core-Blockchain/chaindata/node1/keystore
-  scp root@<server_ip>:/root/Core-Blockchain/chaindata/node1/pass.txt
+  scp -r root@<server_ip>:/root/Core-Blockchain/chaindata/node1/keystore ./
+  scp root@<server_ip>:/root/Core-Blockchain/chaindata/node1/pass.txt ./
 ```
 
 * On your server, start the node that you just installed **([See Usage/Example](#usageexamples))**
