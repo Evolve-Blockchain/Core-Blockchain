@@ -157,7 +157,8 @@ task8(){
   i=1
   while [[ $i -le $totalValidator ]]; do
     echo -e "\n\n${GREEN}+-----------------------------------------------------------------------------------------------------+\n"
-    read -p "Enter password for validator $i:  " password
+    echo -e "Enter password for validator $i:  "
+    read -s password
     echo $password >./chaindata/node$i/pass.txt
     ./node_src/build/bin/geth --datadir ./chaindata/node$i account new --password ./chaindata/node$i/pass.txt
     ((i += 1))
