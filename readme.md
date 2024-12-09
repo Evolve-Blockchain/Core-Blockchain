@@ -102,11 +102,6 @@ To get into a running node's interactive console/tmux session
 ```bash
 tmux attach -t node1
 ```
-To stop a running node or the running blockchain node 
-```bash
-tmux attach -t node1
-```
-
 To exit/detach from an interactive console
 ```text
 Press CTRL & b , release both keys, and press d
