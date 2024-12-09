@@ -345,6 +345,25 @@ const ValidatorsInteractiveABI = `[
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": false,
 				"internalType": "address",
 				"name": "user",
@@ -452,19 +471,6 @@ const ValidatorsInteractiveABI = `[
 	},
 	{
 		"inputs": [],
-		"name": "WithdrawProfitPeriod",
-		"outputs": [
-			{
-				"internalType": "uint64",
-				"name": "",
-				"type": "uint64"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "burnPartPercent",
 		"outputs": [
 			{
@@ -490,6 +496,64 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "commInfo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "coinPoolPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "ownerPoolPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "foundationPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "foundationWallet",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "ownerPool",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "coinPool",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "ownerPoolCol",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "coinPoolCol",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "ownerPoolColLimit",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "coinPoolColLimit",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -503,19 +567,6 @@ const ValidatorsInteractiveABI = `[
 				"internalType": "address",
 				"name": "",
 				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "contractPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -755,11 +806,6 @@ const ValidatorsInteractiveABI = `[
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
 				"internalType": "address[]",
 				"name": "",
 				"type": "address[]"
@@ -797,7 +843,7 @@ const ValidatorsInteractiveABI = `[
 		],
 		"name": "initialize",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -884,6 +930,19 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -934,6 +993,52 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "setBurnStopAmount",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "setCoinPool",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "setCoinPoolLimit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -949,6 +1054,58 @@ const ValidatorsInteractiveABI = `[
 				"type": "bool"
 			}
 		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_wallet",
+				"type": "address"
+			}
+		],
+		"name": "setFoundationWallet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "setOwnerPool",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "setOwnerPoolLimit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "setValidatorHelper",
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -997,19 +1154,6 @@ const ValidatorsInteractiveABI = `[
 	},
 	{
 		"inputs": [],
-		"name": "stakerPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "totalBurnt",
 		"outputs": [
 			{
@@ -1036,7 +1180,7 @@ const ValidatorsInteractiveABI = `[
 	},
 	{
 		"inputs": [],
-		"name": "totalRewardOut",
+		"name": "totalStake",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -1048,16 +1192,16 @@ const ValidatorsInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "totalStake",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
 			}
 		],
-		"stateMutability": "view",
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -1119,6 +1263,67 @@ const ValidatorsInteractiveABI = `[
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_validatorPartPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_burnPartPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_coinPoolPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_ownerPoolPercent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_foundationPercent",
+				"type": "uint256"
+			}
+		],
+		"name": "updateGasFeePercentages",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint16",
+				"name": "_maxValidators",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint64",
+				"name": "_stakingLockPeriod",
+				"type": "uint64"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_minimalStakingCoin",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_minimumValidatorStaking",
+				"type": "uint256"
+			}
+		],
+		"name": "updateParams",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "moniker",
 				"type": "string"
@@ -1153,6 +1358,19 @@ const ValidatorsInteractiveABI = `[
 			}
 		],
 		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "validatorHelperAdd",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -1360,45 +1578,6 @@ const PunishInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "WithdrawProfitPeriod",
-		"outputs": [
-			{
-				"internalType": "uint64",
-				"name": "",
-				"type": "uint64"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "burnPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "burnStopAmount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -1415,19 +1594,6 @@ const PunishInteractiveABI = `[
 			}
 		],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "contractPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -1578,45 +1744,6 @@ const PunishInteractiveABI = `[
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "stakerPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalBurnt",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "validatorPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
 	}
 ]`
 
@@ -1626,9 +1753,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "id",
-				"type": "bytes32"
+				"type": "uint256"
 			},
 			{
 				"indexed": true,
@@ -1657,9 +1784,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "id",
-				"type": "bytes32"
+				"type": "uint256"
 			},
 			{
 				"indexed": true,
@@ -1682,9 +1809,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "id",
-				"type": "bytes32"
+				"type": "uint256"
 			},
 			{
 				"indexed": true,
@@ -1726,9 +1853,9 @@ const ProposalInteractiveABI = `[
 		"inputs": [
 			{
 				"indexed": true,
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "id",
-				"type": "bytes32"
+				"type": "uint256"
 			},
 			{
 				"indexed": true,
@@ -1831,58 +1958,6 @@ const ProposalInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "WithdrawProfitPeriod",
-		"outputs": [
-			{
-				"internalType": "uint64",
-				"name": "",
-				"type": "uint64"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "burnPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "burnStopAmount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "contractPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -1933,6 +2008,25 @@ const ProposalInteractiveABI = `[
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "lastProposalActive",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "minimumValidatorStaking",
 		"outputs": [
@@ -1966,6 +2060,19 @@ const ProposalInteractiveABI = `[
 	},
 	{
 		"inputs": [],
+		"name": "proposalCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "proposalLastingPeriod",
 		"outputs": [
 			{
@@ -1980,9 +2087,9 @@ const ProposalInteractiveABI = `[
 	{
 		"inputs": [
 			{
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "",
-				"type": "bytes32"
+				"type": "uint256"
 			}
 		],
 		"name": "proposals",
@@ -2046,50 +2153,11 @@ const ProposalInteractiveABI = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "stakerPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalBurnt",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "validatorPartPercent",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "id",
-				"type": "bytes32"
+				"type": "uint256"
 			},
 			{
 				"internalType": "bool",
@@ -2116,9 +2184,9 @@ const ProposalInteractiveABI = `[
 				"type": "address"
 			},
 			{
-				"internalType": "bytes32",
+				"internalType": "uint256",
 				"name": "",
-				"type": "bytes32"
+				"type": "uint256"
 			}
 		],
 		"name": "votes",

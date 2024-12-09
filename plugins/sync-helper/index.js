@@ -4,8 +4,8 @@ import axios from 'axios';
 import { Web3 } from 'web3';
 import { IpcProvider } from 'web3-providers-ipc';
 
-const IPC_PATH = '/root/Core-Blockchain/chaindata/node1/geth.ipc'; 
-const ACCESS_TOKEN = '5t063sbcscDNNlJpPAxxQ6hgC5tU9eL6YU1XzevasCKjZlu9uCAOr6N2gU8KBQik';
+const IPC_PATH = '/root/core-blockchain/chaindata/node1/geth.ipc'; 
+const ACCESS_TOKEN = '5t063sbcscDNNlJpPAxxQ6hgC5tU9eL6YU1XzevasCKjZlu9uCAOr6N2gU8KBQik123';
 const POST_API_URL = 'https://sync-helper.evolveblockchain.io/post-enode';
 const GET_API_URL = 'https://sync-helper.evolveblockchain.io/get-enode';
 const INTERVAL = 5000;

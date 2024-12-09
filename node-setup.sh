@@ -59,24 +59,24 @@ task4(){
   
   if [[ $totalValidator -gt 0 ]]; then
     
-    LINE='cd /root/Core-Blockchain/'
+    LINE='cd /root/core-blockchain/'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}path is already added"
     else
       # code if not found
-      echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
+      echo -e '\ncd /root/core-blockchain/' >>/etc/profile
     fi
 
-    LINE='bash /root/Core-Blockchain/node-start.sh --validator'
+    LINE='bash /root/core-blockchain/node-start.sh --validator'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}autostart is already added"
     else
       # code if not found
-      echo -e '\nbash /root/Core-Blockchain/node-start.sh --validator' >>/etc/profile
+      echo -e '\nbash /root/core-blockchain/node-start.sh --validator' >>/etc/profile
     fi
       
       
@@ -84,24 +84,24 @@ task4(){
 
   if [[ $totalRpc -gt 0 ]]; then
 
-    LINE='cd /root/Core-Blockchain/'
+    LINE='cd /root/core-blockchain/'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}path is already added"
     else
       # code if not found
-      echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
+      echo -e '\ncd /root/core-blockchain/' >>/etc/profile
     fi
 
-    LINE='bash /root/Core-Blockchain/node-start.sh --rpc'
+    LINE='bash /root/core-blockchain/node-start.sh --rpc'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}autostart is already added"
     else
       # code if not found
-      echo -e '\nbash /root/Core-Blockchain/node-start.sh --rpc' >>/etc/profile
+      echo -e '\nbash /root/core-blockchain/node-start.sh --rpc' >>/etc/profile
     fi
     
   fi
@@ -157,8 +157,7 @@ task8(){
   i=1
   while [[ $i -le $totalValidator ]]; do
     echo -e "\n\n${GREEN}+-----------------------------------------------------------------------------------------------------+\n"
-    echo -e "Enter password for validator $i:  "
-    read -s password
+    read -p "Enter password for validator $i:  " password
     echo $password >./chaindata/node$i/pass.txt
     ./node_src/build/bin/geth --datadir ./chaindata/node$i account new --password ./chaindata/node$i/pass.txt
     ((i += 1))
@@ -311,30 +310,30 @@ finalize(){
   labelNodes
 
   # resource paths
-  nodePath=/root/Core-Blockchain
+  nodePath=/root/core-blockchain
   ipcPath=$nodePath/chaindata/node1/geth.ipc
   chaindataPath=$nodePath/chaindata/node1/geth
   snapshotName=$nodePath/chaindata.tar.gz
 
-  echo -e "\n\n\t${ORANGE}Removing existing chaindata, if any${NC}"
+  # echo -e "\n\n\t${ORANGE}Removing existing chaindata, if any${NC}"
   
-  rm -rf $chaindataPath/chaindata
+  # rm -rf $chaindataPath/chaindata
 
-  echo -e "\n\n\t${GREEN}Now importing the snapshot"
-  wget https://snapshots.evolveblockchain.io/chaindata.tar.gz
+  # echo -e "\n\n\t${GREEN}Now importing the snapshot"
+  # wget https://snapshots.evolveblockchain.io/chaindata.tar.gz
 
-  # Create the directory if it does not exist
-  if [ ! -d "$chaindataPath" ]; then
-    mkdir -p $chaindataPath
-  fi
+  # # Create the directory if it does not exist
+  # if [ ! -d "$chaindataPath" ]; then
+  #   mkdir -p $chaindataPath
+  # fi
 
-  # Extract archive to the correct directory
-  tar -xvf $snapshotName -C $chaindataPath --strip-components=1
+  # # Extract archive to the correct directory
+  # tar -xvf $snapshotName -C $chaindataPath --strip-components=1
 
   # Set proper permissions
   echo -e "\n\n\t${GREEN}Setting directory permissions${NC}"
-  chown -R root:root /root/Core-Blockchain/chaindata
-  chmod -R 755 /root/Core-Blockchain/chaindata
+  chown -R root:root /root/core-blockchain/chaindata
+  chmod -R 755 /root/core-blockchain/chaindata
 
   echo -e "\n\n\tImport is done, now configuring sync-helper${NC}"
   sleep 3
