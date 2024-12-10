@@ -46,7 +46,7 @@ countNodes(){
 
 stopNode(){
   local session=$1
-  local nodePath="/root/core-blockchain/chaindata/$session"
+  local nodePath="/root/Core-Blockchain/chaindata/$session"
   
   if tmux has-session -t "$session" 2>/dev/null; then
     tmux send-keys -t "$session" "exit" Enter

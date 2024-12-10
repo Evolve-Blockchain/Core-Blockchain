@@ -59,24 +59,24 @@ task4(){
   
   if [[ $totalValidator -gt 0 ]]; then
     
-    LINE='cd /root/core-blockchain/'
+    LINE='cd /root/Core-Blockchain/'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}path is already added"
     else
       # code if not found
-      echo -e '\ncd /root/core-blockchain/' >>/etc/profile
+      echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
     fi
 
-    LINE='bash /root/core-blockchain/node-start.sh --validator'
+    LINE='bash /root/Core-Blockchain/node-start.sh --validator'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}autostart is already added"
     else
       # code if not found
-      echo -e '\nbash /root/core-blockchain/node-start.sh --validator' >>/etc/profile
+      echo -e '\nbash /root/Core-Blockchain/node-start.sh --validator' >>/etc/profile
     fi
       
       
@@ -84,24 +84,24 @@ task4(){
 
   if [[ $totalRpc -gt 0 ]]; then
 
-    LINE='cd /root/core-blockchain/'
+    LINE='cd /root/Core-Blockchain/'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}path is already added"
     else
       # code if not found
-      echo -e '\ncd /root/core-blockchain/' >>/etc/profile
+      echo -e '\ncd /root/Core-Blockchain/' >>/etc/profile
     fi
 
-    LINE='bash /root/core-blockchain/node-start.sh --rpc'
+    LINE='bash /root/Core-Blockchain/node-start.sh --rpc'
     if grep -Fxq "$LINE" /etc/profile
     then
       # code if found
       echo -e "${ORANGE}autostart is already added"
     else
       # code if not found
-      echo -e '\nbash /root/core-blockchain/node-start.sh --rpc' >>/etc/profile
+      echo -e '\nbash /root/Core-Blockchain/node-start.sh --rpc' >>/etc/profile
     fi
     
   fi
@@ -310,7 +310,7 @@ finalize(){
   labelNodes
 
   # resource paths
-  nodePath=/root/core-blockchain
+  nodePath=/root/Core-Blockchain
   ipcPath=$nodePath/chaindata/node1/geth.ipc
   chaindataPath=$nodePath/chaindata/node1/geth
   snapshotName=$nodePath/chaindata.tar.gz
@@ -332,8 +332,8 @@ finalize(){
 
   # Set proper permissions
   echo -e "\n\n\t${GREEN}Setting directory permissions${NC}"
-  chown -R root:root /root/core-blockchain/chaindata
-  chmod -R 755 /root/core-blockchain/chaindata
+  chown -R root:root /root/Core-Blockchain/chaindata
+  chmod -R 755 /root/Core-Blockchain/chaindata
 
   echo -e "\n\n\tImport is done, now configuring sync-helper${NC}"
   sleep 3
