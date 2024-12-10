@@ -60,6 +60,7 @@ Connect again to your server after reboot
   git clone https://github.com/Evolve-Blockchain/Core-Blockchain.git
   cd Core-Blockchain
   ./node-setup.sh --validator 1
+  source ~/.bashrc
 ```
 After you run node-setup, follow the on-screen instructions carefully and you'll get confirmation that the node was successfully installed on your system.
 
