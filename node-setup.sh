@@ -148,23 +148,67 @@ task7(){
   echo -e "\n${GREEN}[TASK 7 PASSED]${NC}\n"
 }
 
+# task8(){
+#   #TASK 8
+#   echo -e "\n${ORANGE}TASK: ${GREEN}[Setting up Accounts]${NC}\n"
+#   echo -e "\n${ORANGE}This step is very important. Input a password that will be used for a newly created validator account. In next step you will recieve a public key for your validator account"
+#   echo -e "${ORANGE}Once a validator account is created using your given password, You'll be able to see where the keystore file is located so you can import it in metamask\n\n${NC}"
+
+#   i=1
+#   while [[ $i -le $totalValidator ]]; do
+#     echo -e "\n\n${GREEN}+-----------------------------------------------------------------------------------------------------+\n"
+#     read -p "Enter password for validator $i:  " password
+#     echo $password >./chaindata/node$i/pass.txt
+#     ./node_src/build/bin/geth --datadir ./chaindata/node$i account new --password ./chaindata/node$i/pass.txt
+#     ((i += 1))
+#   done
+
+#   echo -e "\n${GREEN}[TASK 8 PASSED]${NC}\n"
+# }
+
+
 task8(){
   #TASK 8
   echo -e "\n${ORANGE}TASK: ${GREEN}[Setting up Accounts]${NC}\n"
-  echo -e "\n${ORANGE}This step is very important. Input a password that will be used for a newly created validator account. In next step you will recieve a public key for your validator account"
-  echo -e "${ORANGE}Once a validator account is created using your given password, I'll give you where the keystore file is located so you can import it in metamask\n\n${NC}"
-
+  echo -e "\n${ORANGE}This step is very important. Input a password that will be used for a newly created validator account. In the next step you will receive a public key for your validator account."
+  echo -e "${ORANGE}Once a validator account is created using your given password, you'll be able to see where the keystore file is located so you can import it in MetaMask\n\n${NC}"
+  
   i=1
   while [[ $i -le $totalValidator ]]; do
     echo -e "\n\n${GREEN}+-----------------------------------------------------------------------------------------------------+\n"
-    read -p "Enter password for validator $i:  " password
-    echo $password >./chaindata/node$i/pass.txt
-    ./node_src/build/bin/geth --datadir ./chaindata/node$i account new --password ./chaindata/node$i/pass.txt
+    while true; do
+      read -p "Do you want to import your existing wallet for validator $i? (y/n): " choice
+      case $choice in
+        y|Y)
+          read -p "Enter the private key for validator $i: " private_key
+          read -p "Enter the password for your imported wallet: " password
+          echo $private_key >./chaindata/node$i/pk.txt
+          echo $password >./chaindata/node$i/pass.txt
+          ./node_src/build/bin/geth --datadir ./chaindata/node$i account import ./chaindata/node$i/pk.txt --password ./chaindata/node$i/pass.txt
+          echo -e "\n${GREEN}Imported wallet for validator $i with the given private key.\n${NC}"
+          break
+          ;;
+        n|N)
+          read -p "Enter password for validator $i: " password
+          echo $password >./chaindata/node$i/pass.txt
+          ./node_src/build/bin/geth --datadir ./chaindata/node$i account new --password ./chaindata/node$i/pass.txt
+          break
+          ;;
+        *)
+          echo -e "${RED}Invalid input. Please enter 'y' for yes or 'n' for no.${NC}"
+          ;;
+      esac
+    done
     ((i += 1))
   done
 
   echo -e "\n${GREEN}[TASK 8 PASSED]${NC}\n"
 }
+
+
+
+
+
 
 labelNodes(){
   i=1
@@ -300,6 +344,21 @@ install_nvm() {
   npm install --global pm2
 
   source ~/.bashrc
+}
+
+# Function to delete a folder or file if it exists
+delete_if_exists() {
+  local target="$1"
+
+  if [ -d "$target" ]; then
+    echo "Deleting folder: $target"
+    rm -rf "$target"
+  elif [ -f "$target" ]; then
+    echo "Deleting file: $target"
+    rm -f "$target"
+  else
+    echo "No such file or folder: $target"
+  fi
 }
 
 
