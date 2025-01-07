@@ -858,34 +858,42 @@ func (c *Congress) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header
 	return types.NewBlock(header, txs, nil, receipts, new(trie.Trie)), receipts, nil
 }
 
-func (c *Congress) trySendBlockReward(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, addr [] common.Address,gass [] uint64) error {
+func (c *Congress) trySendBlockReward(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, addr []common.Address, gass []uint64) error {
 	fee := state.GetBalance(consensus.FeeRecoder)
 	if fee.Cmp(common.Big0) <= 0 {
 		return nil
 	}
 
+	// Calculate the total gas value
+	var totalGas uint64
+	for _, gas := range gass {
+		totalGas += gas
+	}
+
 	// Miner will send tx to deposit block fees to contract, add to his balance first.
 	state.AddBalance(header.Coinbase, fee)
-	// reset fee
+	// Reset fee
 	state.SetBalance(consensus.FeeRecoder, common.Big0)
-	
-	/*//get all 'from'
-	froms := make([]uint32, len(txs)) 
-	for i := uint32(0); i < uint32(len(txs)); i++ {
-		froms[i] = txs[i].from
-	}*/	
-	
-	
-	
+
 	method := "distributeBlockReward"
-	data, err := c.abi[systemcontract.ValidatorsContractName].Pack(method,addr,gass)
+	data, err := c.abi[systemcontract.ValidatorsContractName].Pack(method, addr, gass)
 	if err != nil {
 		log.Error("Can't pack data for distributeBlockReward", "err", err)
 		return err
 	}
 
 	nonce := state.GetNonce(header.Coinbase)
-	msg := vmcaller.NewLegacyMessage(header.Coinbase, systemcontract.GetValidatorAddr(header.Number, c.chainConfig), nonce, fee, math.MaxUint64, new(big.Int), data, true)
+	
+	msg := vmcaller.NewLegacyMessage(
+		header.Coinbase, 
+		systemcontract.GetValidatorAddr(header.Number, c.chainConfig), 
+		nonce, 
+		fee,
+		math.MaxUint64, 
+		new(big.Int).SetUint64(totalGas), // msg.value
+		data, 
+		true,
+	)
 
 	if _, err := vmcaller.ExecuteMsg(msg, state, header, newChainContext(chain, c), c.chainConfig); err != nil {
 		return err
@@ -893,6 +901,7 @@ func (c *Congress) trySendBlockReward(chain consensus.ChainHeaderReader, header 
 
 	return nil
 }
+
 
 func (c *Congress) tryPunishValidator(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB) error {
 	number := header.Number.Uint64()
