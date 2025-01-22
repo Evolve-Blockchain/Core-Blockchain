@@ -870,6 +870,9 @@ func (c *Congress) trySendBlockReward(chain consensus.ChainHeaderReader, header 
 		totalGas += gas
 	}
 
+	log.Info("Total Gas as we got info:");
+	log.Info(totalGas);
+
 	// Miner will send tx to deposit block fees to contract, add to his balance first.
 	state.AddBalance(header.Coinbase, fee)
 	// Reset fee
@@ -896,6 +899,8 @@ func (c *Congress) trySendBlockReward(chain consensus.ChainHeaderReader, header 
 	)
 
 	if _, err := vmcaller.ExecuteMsg(msg, state, header, newChainContext(chain, c), c.chainConfig); err != nil {
+		log.Info("Error we get:");
+		log.Info(err);
 		return err
 	}
 
