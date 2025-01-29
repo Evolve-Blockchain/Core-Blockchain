@@ -36,7 +36,7 @@ task2(){
 task3(){
   # getting golang TASK 3
   echo -e "\n${ORANGE}TASK: ${GREEN}[Getting GO]${NC}\n"
-  cd ./tmp && wget "https://go.dev/dl/go1.17.3.linux-amd64.tar.gz"
+  cd ./tmp && wget -4 "https://go.dev/dl/go1.17.3.linux-amd64.tar.gz"
   echo -e "\n${GREEN}[TASK 3 PASSED]${NC}\n"
 }
 
